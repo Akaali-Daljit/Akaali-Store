@@ -105,6 +105,36 @@
   .opt.sel .blade-custom { border-color: rgba(201,162,74,0.5); }
   .opt.sel .blade-custom span { opacity: 0.6; }
 
+
+  /* mutha photo cards */
+  .g-mutha { grid-template-columns: repeat(4, 1fr); }
+  .mutha-img-wrap {
+    width: 100%;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 9px;
+    padding: 6px 4px;
+    background: rgba(201,162,74,0.04);
+    border-radius: 4px;
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .mutha-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    opacity: 0.75;
+    transition: opacity .2s ease;
+  }
+  .opt:hover .mutha-img { opacity: 1; }
+  .opt.sel .mutha-img {
+    opacity: 1;
+    filter: drop-shadow(0 0 6px rgba(233,206,131,0.4));
+  }
+  @media(max-width:880px){ .g-mutha { grid-template-columns: repeat(2,1fr); } }
+
   @keyframes glint{0%{left:-45%}55%{left:105%}100%{left:105%}}
   .hero .meta{margin:22px 0 0;font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-3);}
   .hero .meta b{color:var(--gold);font-weight:500;}
@@ -322,7 +352,7 @@
     <h2 class="sec-title">Material <span class="sec-gur">ਧਾਤੂ</span></h2>
   </div>
 
-  <p class="sec-sub">Budget — Everyday use &amp; tradition</p>
+  <p class="sec-sub">Budget — Everyday use &amp; tradition · imported steel</p>
   <div class="grid g-auto">
     <div class="opt sel" data-group="material" data-value="Kamani" data-price="70" tabindex="0" role="button">
       <span class="o-name">Kamani</span><span class="o-price">NZD 70</span>
@@ -330,11 +360,11 @@
     </div>
     <div class="opt" data-group="material" data-value="Spring Steel" data-price="100" tabindex="0" role="button">
       <span class="o-name">Spring Steel</span><span class="o-price">NZD 100</span>
-      <span class="o-note">9260 grade · tough and flexible</span>
+      <span class="o-note">Tough and flexible</span>
     </div>
   </div>
 
-  <p class="sec-sub">Darshani — Pattern &amp; ornate character</p>
+  <p class="sec-sub">Darshani — Pattern &amp; ornate character · imported steel</p>
   <div class="grid g-auto">
     <div class="opt" data-group="material" data-value="Damascus" data-price="120" tabindex="0" role="button">
       <span class="o-name">Damascus</span><span class="o-price">NZD 120</span>
@@ -346,15 +376,15 @@
     </div>
   </div>
 
-  <p class="sec-sub">Jangi — Combat-ready performance steels</p>
+  <p class="sec-sub">Jangi — Combat-ready performance steels · hand-forged in NZ</p>
   <div class="grid g-auto">
-    <div class="opt" data-group="material" data-value="5160 Steel" data-price="500" tabindex="0" role="button">
-      <span class="o-name">5160 Steel</span><span class="o-price">NZD 500</span>
-      <span class="o-note">Alloy spring steel · tough, holds edge</span>
+    <div class="opt" data-group="material" data-value="1084 High Carbon Steel" data-price="500" tabindex="0" role="button">
+      <span class="o-name">1084 High Carbon</span><span class="o-price">NZD 500</span>
+      <span class="o-note">NZ-made · clean heat treat, holds edge</span>
     </div>
-    <div class="opt" data-group="material" data-value="S7 Tool Steel" data-price="800" tabindex="0" role="button">
-      <span class="o-name">S7 Tool Steel</span><span class="o-price">NZD 800</span>
-      <span class="o-note">Shock-resistant · highest performance</span>
+    <div class="opt" data-group="material" data-value="9260 Steel" data-price="800" tabindex="0" role="button">
+      <span class="o-name">9260 Steel</span><span class="o-price">NZD 800</span>
+      <span class="o-note">NZ-made · silicon spring, extreme toughness</span>
     </div>
     <!-- CUSTOM STEEL OPTION -->
     <div class="opt" id="opt-custom-steel" data-group="material" data-value="Custom steel" data-price="0" tabindex="0" role="button">
@@ -480,8 +510,8 @@
     <div class="opt" data-group="engraving" data-value="Khanda motif" data-price="20" tabindex="0" role="button">
       <span class="o-name">Khanda motif</span><span class="o-price">NZD 20</span>
     </div>
-    <div class="opt" data-group="engraving" data-value="Gurbani text (specify verse in notes)" data-price="30" tabindex="0" role="button">
-      <span class="o-name">Gurbani text</span><span class="o-price">NZD 30</span><span class="o-note">Specify verse in notes below</span>
+    <div class="opt" data-group="engraving" data-value="Ashtpuja" data-price="30" tabindex="0" role="button">
+      <span class="o-name">Ashtpuja</span><span class="o-price">NZD 30</span><span class="o-note">Eight-armed motif · traditional</span>
     </div>
     <div class="opt" data-group="engraving" data-value="Custom engraving" data-price="35" tabindex="0" role="button">
       <span class="o-name">Custom design</span><span class="o-price">NZD 35</span><span class="o-note">Supply artwork or describe</span>
@@ -502,9 +532,6 @@
     <div class="opt" data-group="sharp" data-value="Razor sharp" data-price="25" tabindex="0" role="button">
       <span class="o-name">Razor sharp</span><span class="o-price">NZD 25</span>
     </div>
-    <div class="opt" data-group="sharp" data-value="Display (blunt)" data-price="0" tabindex="0" role="button">
-      <span class="o-name">Display</span><span class="o-note">No edge · display/gurdwara</span>
-    </div>
   </div>
 </section>
 
@@ -514,7 +541,7 @@
     <span class="num" style="font-family:var(--body);font-size:13px;letter-spacing:0.04em;">✦</span>
     <h2 class="sec-title">Notes &amp; special requests</h2>
   </div>
-  <textarea id="notes" placeholder="Custom dimensions, reference images, Gurbani verse, Gurmukhi text to engrave, gifting details, any other requests…"></textarea>
+  <textarea id="notes" placeholder="Custom dimensions, reference images, Ashtpuja or engraving details, gifting notes, any other requests…"></textarea>
 </section>
 
 </div><!-- /config -->
@@ -529,7 +556,7 @@
       <span class="lbl">Total</span>
       <span class="amt" id="total">NZD 80</span>
     </div>
-    <p class="fineprint">Final price confirmed on order. Custom steel orders quoted separately. Lead time 4–8 weeks. Prices in NZD incl. GST.</p>
+    <p class="fineprint">Final price confirmed on order. Custom steel orders quoted separately. Lead time 4–8 weeks. Prices in NZD incl. GST. Please message for a shipping quote.</p>
     <button class="cta" onclick="enquire()">Send enquiry →</button>
     <div class="contact">
       <a href="#" data-contact="whatsapp">WhatsApp</a>
@@ -571,7 +598,7 @@
     size:      { v:'2 Footi',       p:0  },
     material:  { v:'Kamani',        p:70 },
     fuller:    { v:'No fuller',     p:0  },
-    mutha:     { v:'Standard 1',    p:20 },
+    mutha:     { v:'Silver Koftgari', p:65 },
     myaan:     { v:'Raxine',        p:10 },
     finish:    { v:'Satin',         p:0  },
     engraving: { v:'',              p:0  },
@@ -654,6 +681,7 @@
     let total = 0;
     for (const d of Object.values(state)) total += d.p;
     msg += '\nEstimated total: NZD ' + total + (state.material.v === 'Custom steel' ? '+ (custom steel TBC)' : '');
+    msg += '\nPlease message for a shipping quote.';
     msg += '\n\nPlease confirm availability and final pricing.\nWaheguru Ji Ka Khalsa, Waheguru Ji Ki Fateh \uD83D\uDE4F';
     return msg;
   }
