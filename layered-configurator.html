@@ -3,126 +3,96 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Akaali Arsenal | Layered Image Configurator</title>
+  <title>Akaali Arsenal | Configurator</title>
   <style>
-    :root {
-      --bg: #0b0c10;
-      --card: #1a202c;
-      --gold: #c8a04d;
-      --gold-light: #e8c97b;
-      --text: #f5f5f5;
-      --muted: #b4b4b4;
-    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
     body {
-      font-family: Inter, "Segoe UI", sans-serif;
-      background: linear-gradient(180deg, #050608, #0b0c10 35%, #12161d 100%);
-      color: var(--text);
-      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      padding: 20px;
     }
-    button { cursor: pointer; border: none; font: inherit; }
-    .container { width: min(1400px, 92%); margin: auto; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 { color: #c8a04d; margin: 30px 0 10px; }
+    p { color: #aaa; margin-bottom: 20px; }
     
-    header { sticky position: top; z-index: 999; backdrop-filter: blur(14px); background: rgba(10, 10, 10, .85); border-bottom: 1px solid rgba(200, 160, 77, .2); padding: 1rem 0; }
-    .nav { display: flex; justify-content: space-between; align-items: center; }
-    .brand { font-size: 1.35rem; font-weight: 700; letter-spacing: .05em; color: var(--gold); }
+    .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin: 40px 0; }
     
-    .hero { padding: 60px 0 40px; text-align: center; }
-    .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); color: var(--gold); margin-bottom: 8px; }
-    .hero p { max-width: 600px; margin: auto; color: var(--muted); line-height: 1.6; font-size: 0.95rem; }
+    .canvas-box { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 20px; }
+    canvas { width: 100%; height: auto; border-radius: 4px; background: #222; }
     
-    .main-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding: 60px 0 100px; align-items: start; }
+    .controls { }
+    .control-section { margin-bottom: 30px; }
+    .control-label { font-weight: 600; color: #c8a04d; margin-bottom: 10px; display: block; }
     
-    .canvas-wrapper { background: var(--card); border: 1px solid rgba(255, 255, 255, .08); border-radius: 18px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.35); aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; position: relative; }
+    .button-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+    button {
+      padding: 10px 16px;
+      background: #222;
+      border: 1px solid #444;
+      color: #aaa;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    button:hover {
+      border-color: #c8a04d;
+      color: #c8a04d;
+    }
+    button.active {
+      background: #c8a04d;
+      color: #000;
+      border-color: #c8a04d;
+    }
     
-    #compositeCanvas { max-width: 100%; max-height: 100%; display: block; image-rendering: crisp-edges; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .grid-item { position: relative; }
+    .grid-item button { width: 100%; padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 100px; }
+    .grid-item label { font-size: 12px; text-align: center; }
     
-    .status-msg { position: absolute; color: var(--muted); font-size: 0.9rem; }
+    .status { margin: 20px 0; padding: 10px; background: #222; border-left: 3px solid #c8a04d; border-radius: 4px; color: #aaa; min-height: 20px; }
     
-    .config-panel { display: flex; flex-direction: column; gap: 30px; }
-    
-    .section { border-top: 1px solid rgba(255, 255, 255, .08); padding-top: 25px; }
-    .section:first-child { border-top: none; padding-top: 0; }
-    
-    .section-title { font-size: 1.1rem; color: var(--gold); margin-bottom: 16px; font-weight: 600; }
-    
-    .pill-group { display: flex; flex-wrap: wrap; gap: 8px; }
-    
-    .pill { padding: 9px 16px; border-radius: 999px; background: #1b2431; color: var(--muted); border: 1px solid rgba(255, 255, 255, .1); font-size: 0.85rem; cursor: pointer; transition: all 0.15s; font-weight: 500; }
-    
-    .pill:hover { border-color: var(--gold-light); color: var(--gold-light); background: #242f3f; }
-    
-    .pill.active { background: var(--gold); color: #111; border-color: var(--gold); font-weight: 700; }
-    
-    .hilt-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    
-    .hilt-tile { aspect-ratio: 1; background: #1b2431; border: 2px solid rgba(255, 255, 255, .1); border-radius: 10px; padding: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.15s; text-align: center; }
-    
-    .hilt-tile:hover { border-color: var(--gold-light); background: #242f3f; }
-    
-    .hilt-tile.active { border-color: var(--gold); box-shadow: 0 0 12px rgba(200, 160, 77, 0.3); }
-    
-    .hilt-tile-thumb { width: 60px; height: 60px; background: #0b0c10; border-radius: 6px; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    
-    .hilt-tile-thumb img { width: 100%; height: 100%; object-fit: contain; }
-    
-    .hilt-tile-name { font-size: 0.75rem; color: var(--text); line-height: 1.2; font-weight: 500; }
-    
-    .info-box { background: rgba(200, 160, 77, 0.08); border-left: 3px solid var(--gold); padding: 12px; border-radius: 6px; font-size: 0.85rem; color: var(--text); line-height: 1.5; }
-    
-    footer { padding: 30px 0 50px; text-align: center; color: var(--muted); font-size: 0.8rem; border-top: 1px solid rgba(255, 255, 255, .06); }
-    
-    @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; gap: 30px; } .hilt-grid { grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 600px) { .hilt-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    }
   </style>
 </head>
 <body>
 
-<header>
-  <div class="container nav">
-    <div class="brand">AKAALI ARSENAL</div>
-  </div>
-</header>
+<div class="container">
+  <h1>⚔️ Akaali Arsenal Configurator</h1>
+  <p>Select weapon, size, and hilt. Watch it render live.</p>
 
-<section class="hero">
-  <div class="container">
-    <h1>Live Composition</h1>
-    <p>Blade + Hilt rendered in real-time. No pre-generated images.</p>
-  </div>
-</section>
-
-<main class="container">
-  <div class="main-layout">
-    <div class="canvas-wrapper">
-      <canvas id="compositeCanvas" width="500" height="800"></canvas>
-      <div class="status-msg" id="statusMsg"></div>
+  <div class="layout">
+    <!-- CANVAS -->
+    <div class="canvas-box">
+      <canvas id="canvas" width="500" height="800"></canvas>
+      <div class="status" id="status">Loading...</div>
     </div>
 
-    <div class="config-panel">
-      <div class="section">
-        <h3 class="section-title">1. Weapon</h3>
-        <div class="pill-group" id="weaponGroup"></div>
+    <!-- CONTROLS -->
+    <div class="controls">
+      
+      <div class="control-section">
+        <label class="control-label">1. Weapon</label>
+        <div class="button-group" id="weaponBtns"></div>
       </div>
 
-      <div class="section">
-        <h3 class="section-title">2. Size</h3>
-        <div class="pill-group" id="sizeGroup"></div>
+      <div class="control-section">
+        <label class="control-label">2. Size</label>
+        <div class="button-group" id="sizeBtns"></div>
       </div>
 
-      <div class="section">
-        <h3 class="section-title">3. Hilt</h3>
-        <div class="hilt-grid" id="hiltGrid"></div>
+      <div class="control-section">
+        <label class="control-label">3. Hilt Material</label>
+        <div class="grid-4" id="hiltBtns"></div>
       </div>
 
-      <div class="info-box">✦ Live blade + hilt composition on canvas</div>
     </div>
   </div>
-</main>
-
-<footer>
-  <div class="container">Akaali Arsenal · ਅਕਾਲੀ ਅਸਲਾ · Layered Configurator</div>
-</footer>
+</div>
 
 <script>
 const GITHUB_RAW = "https://raw.githubusercontent.com/Akaali-Daljit/Akaali-Store/images";
@@ -136,18 +106,18 @@ const WEAPONS = [
   { id: "khanjar", name: "Khanjar", sizes: [12, 14, 16, 18] }
 ];
 
-const HILT_MAPPING = {
-  "camel-bone": "Camel%20Bone%20Hilt%20free.jpeg",
-  "silver": "Silver%20Hilt%20200.jpeg",
-  "black-silver": "Black%20with%20Silver%20Koftgari%2050.jpeg",
-  "jade": "Jade%20Hilt%20150.jpeg",
-  "agate": "Agate%20Hilt.jpeg",
-  "sodamite": "Sodamite%20Hilt%20150.jpeg",
-  "hilt-250": "Hilt%20250.jpeg",
-  "hilt-silver-100": "Hilt%20Silver%20Thick%20100.jpeg"
-};
+const HILTS = [
+  { id: "camel-bone", name: "Camel Bone", file: "Camel%20Bone%20Hilt%20free.jpeg" },
+  { id: "silver", name: "Silver", file: "Silver%20Hilt%20200.jpeg" },
+  { id: "black-silver", name: "Black Silver", file: "Black%20with%20Silver%20Koftgari%2050.jpeg" },
+  { id: "jade", name: "Jade", file: "Jade%20Hilt%20150.jpeg" },
+  { id: "agate", name: "Agate", file: "Agate%20Hilt.jpeg" },
+  { id: "sodamite", name: "Sodamite", file: "Sodamite%20Hilt%20150.jpeg" },
+  { id: "hilt-250", name: "Ornate 250", file: "Hilt%20250.jpeg" },
+  { id: "hilt-silver-100", name: "Silver Thick", file: "Hilt%20Silver%20Thick%20100.jpeg" }
+];
 
-const BLADE_MAPPING = {
+const BLADES = {
   "peshkabz_12": "PESHKABZ%2012%2014.jpeg",
   "peshkabz_14": "PESHKABZ%2012%2014.jpeg",
   "peshkabz_16": "PESHKABZ%2016,%2018%20(1).jpeg",
@@ -171,7 +141,7 @@ const BLADE_MAPPING = {
   "khanjar_18": "Khanjar%2014,%2016%20and%2018%20inch.jpeg"
 };
 
-const HILT_POSITIONING = {
+const POSITIONS = {
   "peshkabz_12": { x: 120, y: 550, w: 260, h: 170 },
   "peshkabz_14": { x: 100, y: 560, w: 300, h: 180 },
   "peshkabz_16": { x: 80, y: 570, w: 340, h: 190 },
@@ -195,134 +165,108 @@ const HILT_POSITIONING = {
   "khanjar_18": { x: 80, y: 585, w: 340, h: 200 }
 };
 
-class ImageCache {
-  constructor() {
-    this.cache = new Map();
-  }
-
-  async load(url) {
-    if (this.cache.has(url)) return this.cache.get(url);
-
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => { this.cache.set(url, img); resolve(img); };
-      img.onerror = () => reject(new Error(`Failed: ${url}`));
-      img.src = url;
-    });
-  }
-}
-
-const imageCache = new ImageCache();
-
-class Compositor {
-  constructor(canvasId) {
-    this.canvas = document.getElementById(canvasId);
-    this.ctx = this.canvas.getContext("2d");
-  }
-
-  clear() {
-    this.ctx.fillStyle = "transparent";
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-  }
-
-  async render(weapon, size, hilt) {
-    this.clear();
-    const key = `${weapon}_${size}`;
-    const bladeFile = BLADE_MAPPING[key];
-    const hiltFile = HILT_MAPPING[hilt];
-    const pos = HILT_POSITIONING[key];
-
-    if (!bladeFile || !hiltFile || !pos) throw new Error("Missing config");
-
-    try {
-      const bladeUrl = `${GITHUB_RAW}/${bladeFile}`;
-      const hiltUrl = `${GITHUB_RAW}/${hiltFile}`;
-
-      const blade = await imageCache.load(bladeUrl);
-      this.ctx.drawImage(blade, 0, 0, this.canvas.width, this.canvas.height);
-
-      const hiltImg = await imageCache.load(hiltUrl);
-      this.ctx.drawImage(hiltImg, pos.x, pos.y, pos.w, pos.h);
-    } catch (err) {
-      console.error(err);
-      throw err;
-    }
-  }
-}
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const status = document.getElementById("status");
 
 let state = { weapon: "peshkabz", size: 12, hilt: "camel-bone" };
-const compositor = new Compositor("compositeCanvas");
+const cache = new Map();
+
+async function loadImage(url) {
+  if (cache.has(url)) return cache.get(url);
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => { cache.set(url, img); resolve(img); };
+    img.onerror = () => reject(new Error("Image failed"));
+    img.src = url;
+  });
+}
+
+async function render() {
+  try {
+    status.textContent = "Rendering...";
+    const key = `${state.weapon}_${state.size}`;
+    const bladeFile = BLADES[key];
+    const hilt = HILTS.find(h => h.id === state.hilt);
+    const pos = POSITIONS[key];
+
+    if (!bladeFile || !hilt || !pos) throw new Error("Missing config");
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const blade = await loadImage(`${GITHUB_RAW}/${bladeFile}`);
+    ctx.drawImage(blade, 0, 0, canvas.width, canvas.height);
+
+    const hiltImg = await loadImage(`${GITHUB_RAW}/${hilt.file}`);
+    ctx.drawImage(hiltImg, pos.x, pos.y, pos.w, pos.h);
+
+    status.textContent = `✓ ${state.weapon} ${state.size}" + ${hilt.name}`;
+  } catch (err) {
+    console.error(err);
+    status.textContent = `✗ Error: ${err.message}`;
+  }
+}
 
 function renderWeapons() {
-  const group = document.getElementById("weaponGroup");
-  group.innerHTML = "";
+  const container = document.getElementById("weaponBtns");
+  container.innerHTML = "";
   WEAPONS.forEach(w => {
     const btn = document.createElement("button");
-    btn.className = "pill" + (w.id === state.weapon ? " active" : "");
     btn.textContent = w.name;
-    btn.addEventListener("click", () => {
+    btn.className = state.weapon === w.id ? "active" : "";
+    btn.onclick = () => {
       state.weapon = w.id;
       state.size = w.sizes[0];
       renderWeapons();
       renderSizes();
-      updateRender();
-    });
-    group.appendChild(btn);
+      render();
+    };
+    container.appendChild(btn);
   });
 }
 
 function renderSizes() {
-  const group = document.getElementById("sizeGroup");
-  group.innerHTML = "";
+  const container = document.getElementById("sizeBtns");
+  container.innerHTML = "";
   const weapon = WEAPONS.find(w => w.id === state.weapon);
   weapon.sizes.forEach(size => {
     const btn = document.createElement("button");
-    btn.className = "pill" + (size === state.size ? " active" : "");
-    btn.textContent = size + '"';
-    btn.addEventListener("click", () => {
+    btn.textContent = `${size}"`;
+    btn.className = state.size === size ? "active" : "";
+    btn.onclick = () => {
       state.size = size;
       renderSizes();
-      updateRender();
-    });
-    group.appendChild(btn);
+      render();
+    };
+    container.appendChild(btn);
   });
 }
 
 function renderHilts() {
-  const grid = document.getElementById("hiltGrid");
-  grid.innerHTML = "";
-  Object.keys(HILT_MAPPING).forEach(hId => {
-    const tile = document.createElement("button");
-    tile.className = "hilt-tile" + (hId === state.hilt ? " active" : "");
-    const name = hId.replace(/-/g, " ").toUpperCase();
-    tile.innerHTML = `<div class="hilt-tile-thumb"><div style="color:var(--gold);font-size:24px;">◆</div></div><div class="hilt-tile-name">${name}</div>`;
-    tile.addEventListener("click", () => {
-      state.hilt = hId;
+  const container = document.getElementById("hiltBtns");
+  container.innerHTML = "";
+  HILTS.forEach(h => {
+    const item = document.createElement("div");
+    item.className = "grid-item";
+    const btn = document.createElement("button");
+    btn.className = state.hilt === h.id ? "active" : "";
+    btn.innerHTML = `<span style="font-size:24px;">◆</span><label>${h.name}</label>`;
+    btn.onclick = () => {
+      state.hilt = h.id;
       renderHilts();
-      updateRender();
-    });
-    grid.appendChild(tile);
+      render();
+    };
+    item.appendChild(btn);
+    container.appendChild(item);
   });
 }
 
-async function updateRender() {
-  const statusMsg = document.getElementById("statusMsg");
-  try {
-    statusMsg.textContent = "Rendering...";
-    await compositor.render(state.weapon, state.size, state.hilt);
-    statusMsg.textContent = "";
-  } catch (err) {
-    statusMsg.textContent = "⚠ Error";
-  }
-}
-
-window.addEventListener("DOMContentLoaded", () => {
-  renderWeapons();
-  renderSizes();
-  renderHilts();
-  updateRender();
-});
+// Initialize
+renderWeapons();
+renderSizes();
+renderHilts();
+render();
 </script>
 
 </body>
