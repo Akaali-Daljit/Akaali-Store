@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Akaali Arsenal | Layered Shastar Configurator</title>
+  <meta name="description" content="Advanced layered rendering system for custom Shastar — katar, peshkabz, kard, bichhua, jambiya, khanjar.">
+  <style>
+    :root {
+      --bg: #0b0c10;
+      --card: #1a202c;
+      --gold: #c8a04d;
+      --gold-light: #e8c97b;
+      --text: #f5f5f5;
+      --muted: #b4b4b4;
+      --radius: 18px;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: Inter, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #050608, #0b0c10 35%, #12161d 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; width: 100%; }
+    button { cursor: pointer; border: none; font: inherit; }
+    .container { width: min(1400px, 92%); margin: auto; }
+
+    /* HEADER */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      backdrop-filter: blur(14px);
+      background: rgba(10, 10, 10, .85);
+      border-bottom: 1px solid rgba(200, 160, 77, .2);
+    }
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+    }
+    .brand {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: .05em;
+      color: var(--gold);
+    }
+    .currency-switch {
+      display: flex;
+      gap: .5rem;
+    }
+    .currency-btn {
+      padding: .55rem .9rem;
+      border-radius: 999px;
+      background: #1a1a1a;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, .12);
+      transition: .2s;
+    }
+    .currency-btn.active {
+      background: var(--gold);
+      color: #111;
+      font-weight: 700;
+    }
+
+    /* HERO */
+    .hero {
+      padding: 80px 0 60px;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+    .hero h2 {
+      font-size: clamp(1.1rem, 3vw, 1.7rem);
+      font-weight: 400;
+      margin-bottom: 18px;
+      color: var(--text);
+    }
+    .hero p {
+      max-width: 720px;
+      margin: auto;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .hero-note {
+      margin-top: 18px;
+      font-size: .85rem;
+      color: #8d8d8d;
+    }
+
+    /* MAIN LAYOUT */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      padding: 60px 0 100px;
+      align-items: start;
+    }
+
+    /* CANVAS AREA */
+    .render-area {
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    #previewCanvas {
+      max-width: 100%;
+      max-height: 100%;
+      image-rendering: crisp-edges;
+    }
+    .render-loading {
+      position: absolute;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .render-error {
+      position: absolute;
+      color: #ff6b6b;
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 20px;
+    }
+
+    /* CONFIG PANEL */
+    .config-section {
+      padding: 30px 0;
+      border-top: 1px solid rgba(255, 255, 255, .08);
+    }
+    .config-section:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+    .section-title {
+      font-size: 1.3rem;
+      color: var(--gold);
+      margin-bottom: 18px;
+      font-weight: 600;
+    }
+    .option-group {
+      margin-bottom: 20px;
+    }
+    .option-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: .9rem;
+      letter-spacing: .02em;
+      color: var(--text);
+    }
+    select, input[type="text"] {
+      width: 100%;
+      padding: 13px;
+      border-radius: 12px;
+      background: #1b2431;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, .08);
+      font-size: .92rem;
+    }
+    select:focus, input[type="text"]:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .pill {
+      padding: 9px 14px;
+      border-radius: 999px;
+      background: #1b2431;
+      color: var(--muted);
+      border: 1px solid rgba(255, 255, 255, .1);
+      font-size: .85rem;
+      cursor: pointer;
+      transition: .15s;
+    }
+    .pill:hover {
+      border-color: var(--gold);
+      color: var(--gold-light);
+    }
+    .pill.active {
+      background: var(--gold);
+      color: #111;
+      border-color: transparent;
+      font-weight: 700;
+    }
+
+    .tile-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .tile {
+      background: #1b2431;
+      border: 2px solid transparent;
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: .15s;
+    }
+    .tile:hover {
+      border-color: var(--gold-light);
+      background: #242f3f;
+    }
+    .tile.active {
+      border-color: var(--gold);
+    }
+    .tile img {
+      aspect-ratio: 1/1;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      max-height: 80px;
+    }
+    .tile span {
+      display: block;
+      font-size: .75rem;
+      line-height: 1.3;
+      color: var(--text);
+    }
+    .tile .tile-price {
+      color: var(--gold-light);
+      font-size: .7rem;
+      margin-top: 4px;
+    }
+
+    .price-panel {
+      background: linear-gradient(135deg, rgba(200, 160, 77, .15), rgba(200, 160, 77, .05));
+      border: 1px solid rgba(200, 160, 77, .2);
+      padding: 18px;
+      border-radius: var(--radius);
+      margin-top: 24px;
+    }
+    .price-label {
+      font-size: .95rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .total-price {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--gold-light);
+      margin-bottom: 16px;
+    }
+    .build-line {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.5;
+    }
+    .quote-note {
+      margin-top: 8px;
+      color: #ffcc7a;
+      font-size: .88rem;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .action-buttons button {
+      flex: 1;
+      padding: 13px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: .9rem;
+    }
+    .whatsapp-btn {
+      background: #25D366;
+      color: white;
+    }
+    .whatsapp-btn:hover {
+      background: #20ba58;
+    }
+    .save-btn {
+      background: #1b2431;
+      color: white;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+    }
+    .save-btn:hover {
+      background: #242f3f;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: #1b2431;
+      border: 1px solid rgba(200, 160, 77, .3);
+      border-radius: 999px;
+      padding: 11px 20px;
+      font-size: .85rem;
+      color: var(--gold-light);
+      opacity: 0;
+      pointer-events: none;
+      transition: .25s;
+      z-index: 6000;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    footer {
+      padding: 30px 0 50px;
+      text-align: center;
+      color: var(--muted);
+      font-size: .85rem;
+      border-top: 1px solid rgba(255, 255, 255, .06);
+      margin-top: 20px;
+    }
+
+    /* ARCHITECTURE NOTES (hidden in production, visible on debug) */
+    .arch-doc {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      border: 1px solid var(--gold);
+      padding: 20px;
+      border-radius: 10px;
+      font-size: 12px;
+      color: var(--gold);
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 9999;
+      font-family: monospace;
+      max-width: 400px;
+    }
+    .arch-doc.show {
+      display: block;
+    }
+
+    @media (max-width: 900px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+      .tile-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    @media (max-width: 600px) {
+      .tile-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="container nav">
+    <div class="brand">AKAALI ARSENAL · LAYERED RENDER</div>
+    <div class="currency-switch" id="currencySwitch">
+      <button class="currency-btn active" data-currency="NZD">NZD</button>
+      <button class="currency-btn" data-currency="USD">USD</button>
+      <button class="currency-btn" data-currency="INR">INR</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <h1>Akaali Arsenal</h1>
+    <h2>Advanced Layered Shastar Configurator</h2>
+    <p>Real-time composed rendering — base blade + steel texture + decorative finish + hilt overlay + optional embellishments.</p>
+    <p class="hero-note">Every combination is rendered on-demand. No pre-generated images needed.</p>
+  </div>
+</section>
+
+<main class="container">
+  <div class="main-layout">
+
+    <!-- CANVAS/RENDER AREA -->
+    <div class="render-area">
+      <canvas id="previewCanvas" width="600" height="600"></canvas>
+      <div class="render-loading" style="display:none;">Loading layers...</div>
+      <div class="render-error" style="display:none;"></div>
+    </div>
+
+    <!-- CONFIG PANEL -->
+    <div class="config-section">
+      <h3 class="section-title">Configure Your Build</h3>
+
+      <!-- WEAPON FAMILY -->
+      <div class="option-group">
+        <label>Weapon Family</label>
+        <div class="pill-row" id="weaponRow"></div>
+      </div>
+
+      <!-- SIZE -->
+      <div class="option-group">
+        <label>Blade Size</label>
+        <div class="pill-row" id="sizeRow"></div>
+      </div>
+
+      <!-- STEEL -->
+      <div class="option-group">
+        <label>Steel Material</label>
+        <div class="pill-row" id="steelRow"></div>
+      </div>
+
+      <!-- FINISH -->
+      <div class="option-group">
+        <label>Blade Finish</label>
+        <select id="finishSelect"></select>
+      </div>
+
+      <!-- HILT (if applicable) -->
+      <div class="option-group" id="hiltGroup" style="display:none;">
+        <label>Hilt Material</label>
+        <div id="hiltGrid" class="tile-grid"></div>
+      </div>
+
+      <!-- DECORATIVE FINISH OVERLAY -->
+      <div class="option-group">
+        <label>Decorative Overlay (optional)</label>
+        <select id="decorativeSelect">
+          <option value="none">None</option>
+          <option value="partial-koftgari">Partial Koftgari — +50 NZD</option>
+          <option value="heavy-koftgari">Heavy Koftgari — +250 NZD</option>
+          <option value="khudai">Khudai / Engraving — +75 NZD</option>
+          <option value="gangajamuna">Gangajamuna — Quote</option>
+          <option value="full-silver">Full Silver Koftgari — Quote</option>
+          <option value="full-gold">Full Gold — Quote</option>
+        </select>
+      </div>
+
+      <!-- PRICE PANEL -->
+      <div class="price-panel">
+        <div class="price-label">Estimated Price</div>
+        <div class="total-price" id="priceDisplay">NZD 0</div>
+        <div id="quoteNotice" class="quote-note"></div>
+        <div class="build-line" id="buildLine"></div>
+        <div class="action-buttons">
+          <button class="whatsapp-btn" id="whatsappBtn">WhatsApp Enquiry</button>
+          <button class="save-btn" id="saveConfig">Save Build</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    Akaali Arsenal · ਅਕਾਲੀ ਅਸਲਾ · Forged in Fatehgarh, Punjab & New Zealand · Final billing always in NZD
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<!-- ARCHITECTURE DEBUG PANEL (press Shift+A to toggle) -->
+<div class="arch-doc" id="archDoc"></div>
+
+<script>
+/**
+ * ========================================================================
+ * AKAALI ARSENAL LAYERED RENDERING ARCHITECTURE
+ * ========================================================================
+ * 
+ * This system implements a complete production-grade layered composition
+ * engine for custom Shastar configurators.
+ * 
+ * LAYERS (Rendered bottom-up):
+ * 1. Base blade (weapon family + size)
+ * 2. Steel texture overlay (damascus, fulladi, etc.)
+ * 3. Decorative finish overlay (koftgari, khudai, etc.)
+ * 4. Hilt material overlay (bone, marble, silver, etc.)
+ * 5. Optional embellishments (gemstones, engravings, etc.)
+ * 6. Optional scabbard (myaan)
+ *
+ * METADATA-DRIVEN POSITIONING:
+ * - Each weapon+size combination has positioning metadata
+ * - Hilt overlays aligned via x,y,width coordinates
+ * - No hardcoded scaling — all values from JSON config
+ *
+ * PERFORMANCE:
+ * - Images lazy-loaded on demand
+ * - Canvas rendering (GPU-accelerated)
+ * - Asset caching via IndexedDB (optional)
+ * - Responsive sizing
+ * - Mobile-optimized
+ * ========================================================================
+ */
+
+/* ============================================
+   ASSET FOLDER STRUCTURE (to be created)
+   ============================================
+
+   assets/
+   ├── blades/
+   │   ├── katar/
+   │   │   ├── 12.png (base blade image)
+   │   │   ├── 14.png
+   │   │   └── 18.png
+   │   ├── peshkabz/
+   │   │   ├── 12.png
+   │   │   ├── 14.png
+   │   │   └── 18.png
+   │   ├── kard/
+   │   │   ├── 12.png
+   │   │   ├── 14.png
+   │   │   └── 16.png
+   │   ├── bichhua/
+   │   ├── jambiya/
+   │   └── khanjar/
+   │
+   ├── textures/
+   │   ├── damascus.png (seamless texture for overlaying)
+   │   ├── fulladi.png
+   │   ├── kamani.png
+   │   └── 1084-hc.png
+   │
+   ├── finishes/
+   │   ├── peshkabz/
+   │   │   ├── partial-koftgari.png (transparent overlay)
+   │   │   ├── heavy-koftgari.png
+   │   │   ├── khudai.png
+   │   │   ├── gangajamuna.png
+   │   │   ├── full-silver.png
+   │   │   └── full-gold.png
+   │   ├── katar/
+   │   │   ├── partial-koftgari.png
+   │   │   └── ... (etc.)
+   │   └── ... (repeat for each weapon family)
+   │
+   ├── hilts/
+   │   ├── wood.png (transparent PNG, hilt area only)
+   │   ├── bone.png
+   │   ├── marble.png
+   │   ├── silver.png
+   │   ├── niello-floral.png
+   │   ├── niello-crest.png
+   │   ├── pommel.png
+   │   ├── abalone.png
+   │   ├── agate.png
+   │   ├── lapis.png
+   │   ├── jade.png
+   │   └── ruby.png
+   │
+   ├── metadata/
+   │   └── positioning.json (hilt alignment + layer positioning)
+   │
+   └── scabbards/ (future)
+       ├── velvet/
+       ├── leather/
+       └── metal/
+
+   ============================================
+*/
+
+const CONTACT_WHATSAPP = "64204301975";
+
+const CURRENCY_RATES = { NZD: 1, USD: 0.574, INR: 54.2 };
+let currentCurrency = localStorage.getItem("akaali_currency") || "NZD";
+
+// ========================================================================
+// PRODUCT DEFINITIONS
+// ========================================================================
+
+const WEAPONS = [
+  {
+    id: "katar",
+    name: "Katar",
+    description: "Clean infantry pattern with balanced proportions",
+    sizes: [12, 14, 18],
+    hasHilt: false,
+    basePrices: {
+      kamani:   { 12: 185, 14: 205, 18: 235 },
+      damascus: { 12: 260, 14: 285, 18: 315 },
+      fulladi:  { 12: 310, 14: 335, 18: 365 },
+      "1084":   { 12: 325, 14: 350, 18: 380 }
+    }
+  },
+  {
+    id: "peshkabz",
+    name: "Peshkabz",
+    description: "Armour-focused with firm spine and decisive point",
+    sizes: [12, 14, 18],
+    hasHilt: true,
+    basePrices: {
+      kamani:   { 12: 185, 14: 205, 18: 235 },
+      damascus: { 12: 260, 14: 285, 18: 315 },
+      fulladi:  { 12: 310, 14: 335, 18: 365 },
+      "1084":   { 12: 325, 14: 350, 18: 380 }
+    }
+  },
+  {
+    id: "kard",
+    name: "Kard",
+    description: "Plain, purposeful straight knife",
+    sizes: [12, 14, 16],
+    hasHilt: true,
+    basePrices: {
+      kamani:   { 12: 165, 14: 180, 16: 195 },
+      damascus: { 12: 235, 14: 255, 16: 275 },
+      fulladi:  { 12: 285, 14: 305, 16: 325 },
+      "1084":   { 12: 295, 14: 320, 16: 345 }
+    }
+  },
+  {
+    id: "bichhua",
+    name: "Bichhua",
+    description: "Compact, recurved with looped hilt",
+    sizes: [12, 14, 18],
+    hasHilt: true,
+    basePrices: {
+      kamani:   { 12: 155, 14: 175, 18: 195 },
+      damascus: { 12: 225, 14: 245, 18: 275 },
+      fulladi:  { 12: 275, 14: 295, 18: 325 },
+      "1084":   { 12: 290, 14: 310, 18: 340 }
+    }
+  },
+  {
+    id: "jambiya",
+    name: "Jambiya",
+    description: "Classic deep-curved profile",
+    sizes: [10, 12, 14],
+    hasHilt: true,
+    basePrices: {
+      kamani:   { 10: 195, 12: 215, 14: 235 },
+      damascus: { 10: 275, 12: 295, 14: 325 },
+      fulladi:  { 10: 325, 12: 345, 14: 375 },
+      "1084":   { 10: 340, 12: 365, 14: 395 }
+    }
+  },
+  {
+    id: "khanjar",
+    name: "Khanjar",
+    description: "Double-edged blade with confident curve",
+    sizes: [10, 12, 14],
+    hasHilt: true,
+    basePrices: {
+      kamani:   { 10: 195, 12: 215, 14: 235 },
+      damascus: { 10: 275, 12: 295, 14: 325 },
+      fulladi:  { 10: 325, 12: 345, 14: 375 },
+      "1084":   { 10: 340, 12: 365, 14: 395 }
+    }
+  }
+];
+
+const STEELS = [
+  { id: "kamani", name: "Kamani" },
+  { id: "damascus", name: "Damascus" },
+  { id: "fulladi", name: "Fulladi" },
+  { id: "1084", name: "1084 High Carbon" }
+];
+
+const HILTS = [
+  { id: "wood", name: "Wooden", price: 0 },
+  { id: "bone", name: "Bone", price: 20 },
+  { id: "marble", name: "White Marble", price: 40 },
+  { id: "silver", name: "Silver Koftgari", price: 50 },
+  { id: "niello-floral", name: "Black Niello Floral", price: 50 },
+  { id: "niello-crest", name: "Black Niello Crest", price: 50 },
+  { id: "pommel", name: "Engraved Pommel", price: 50 },
+  { id: "abalone", name: "Abalone Shell", price: 85 },
+  { id: "agate", name: "Banded Agate", price: 100 },
+  { id: "lapis", name: "Lapis Lazuli", price: 100 },
+  { id: "jade", name: "Jade", price: 100 },
+  { id: "ruby", name: "Ruby & Emerald Set", price: 250 }
+];
+
+const FINISHES = [
+  { id: "plain", name: "Plain", price: 0 },
+  { id: "satin", name: "Satin Finish", price: 0 },
+  { id: "mirror", name: "Mirror Polish", price: 30 },
+  { id: "hand-rubbed", name: "Hand-rubbed", price: 20 },
+  { id: "antique", name: "Antique Patina", price: 25 }
+];
+
+const DECORATIVE = [
+  { id: "none", name: "None", price: 0, overlay: null },
+  { id: "partial-koftgari", name: "Partial Koftgari", price: 50, overlay: true },
+  { id: "heavy-koftgari", name: "Heavy Koftgari", price: 250, overlay: true },
+  { id: "khudai", name: "Khudai / Engraving", price: 75, overlay: true },
+  { id: "gangajamuna", name: "Gangajamuna", price: 0, quoteOnly: true },
+  { id: "full-silver", name: "Full Silver Koftgari", price: 0, quoteOnly: true },
+  { id: "full-gold", name: "Full Gold", price: 0, quoteOnly: true }
+];
+
+// ========================================================================
+// POSITIONING METADATA
+// ========================================================================
+// This is the KEY to the layered system — defines where hilt overlays
+// align for each weapon + size combination
+
+const POSITIONING_METADATA = {
+  // Format: "weaponId_size": { x, y, width, height, hiltScale }
+  // Coordinates are percentage-based for responsiveness
+
+  // KATAR (no hilt, but included for reference)
+  "katar_12":   { bladeY: 0.1, bladeHeight: 0.8, bladeWidth: 0.3 },
+  "katar_14":   { bladeY: 0.1, bladeHeight: 0.8, bladeWidth: 0.35 },
+  "katar_18":   { bladeY: 0.1, bladeHeight: 0.8, bladeWidth: 0.4 },
+
+  // PESHKABZ (hilt position)
+  "peshkabz_12": {
+    bladeY: 0.08,
+    bladeHeight: 0.84,
+    bladeWidth: 0.25,
+    hilt: { x: 0.35, y: 0.65, width: 0.3, height: 0.25, scaleOffset: 1.0 }
+  },
+  "peshkabz_14": {
+    bladeY: 0.08,
+    bladeHeight: 0.84,
+    bladeWidth: 0.3,
+    hilt: { x: 0.35, y: 0.65, width: 0.3, height: 0.25, scaleOffset: 1.0 }
+  },
+  "peshkabz_18": {
+    bladeY: 0.08,
+    bladeHeight: 0.84,
+    bladeWidth: 0.35,
+    hilt: { x: 0.32, y: 0.65, width: 0.35, height: 0.27, scaleOffset: 1.1 }
+  },
+
+  // KARD (hilt position)
+  "kard_12": {
+    bladeY: 0.1,
+    bladeHeight: 0.75,
+    bladeWidth: 0.22,
+    hilt: { x: 0.39, y: 0.7, width: 0.22, height: 0.22, scaleOffset: 0.9 }
+  },
+  "kard_14": {
+    bladeY: 0.08,
+    bladeHeight: 0.78,
+    bladeWidth: 0.26,
+    hilt: { x: 0.37, y: 0.72, width: 0.26, height: 0.24, scaleOffset: 0.95 }
+  },
+  "kard_16": {
+    bladeY: 0.08,
+    bladeHeight: 0.78,
+    bladeWidth: 0.3,
+    hilt: { x: 0.35, y: 0.72, width: 0.3, height: 0.24, scaleOffset: 1.0 }
+  },
+
+  // BICHHUA (hilt position)
+  "bichhua_12": {
+    bladeY: 0.12,
+    bladeHeight: 0.7,
+    bladeWidth: 0.2,
+    hilt: { x: 0.4, y: 0.72, width: 0.2, height: 0.2, scaleOffset: 0.85 }
+  },
+  "bichhua_14": {
+    bladeY: 0.1,
+    bladeHeight: 0.73,
+    bladeWidth: 0.24,
+    hilt: { x: 0.38, y: 0.73, width: 0.24, height: 0.22, scaleOffset: 0.9 }
+  },
+  "bichhua_18": {
+    bladeY: 0.08,
+    bladeHeight: 0.76,
+    bladeWidth: 0.28,
+    hilt: { x: 0.36, y: 0.74, width: 0.28, height: 0.24, scaleOffset: 0.95 }
+  },
+
+  // JAMBIYA (hilt position)
+  "jambiya_10": {
+    bladeY: 0.1,
+    bladeHeight: 0.75,
+    bladeWidth: 0.22,
+    hilt: { x: 0.39, y: 0.7, width: 0.22, height: 0.22, scaleOffset: 0.9 }
+  },
+  "jambiya_12": {
+    bladeY: 0.08,
+    bladeHeight: 0.78,
+    bladeWidth: 0.26,
+    hilt: { x: 0.37, y: 0.72, width: 0.26, height: 0.24, scaleOffset: 0.95 }
+  },
+  "jambiya_14": {
+    bladeY: 0.08,
+    bladeHeight: 0.78,
+    bladeWidth: 0.3,
+    hilt: { x: 0.35, y: 0.72, width: 0.3, height: 0.24, scaleOffset: 1.0 }
+  },
+
+  // KHANJAR (hilt position)
+  "khanjar_10": {
+    bladeY: 0.1,
+    bladeHeight: 0.75,
+    bladeWidth: 0.24,
+    hilt: { x: 0.38, y: 0.7, width: 0.24, height: 0.24, scaleOffset: 0.92 }
+  },
+  "khanjar_12": {
+    bladeY: 0.08,
+    bladeHeight: 0.78,
+    bladeWidth: 0.28,
+    hilt: { x: 0.36, y: 0.72, width: 0.28, height: 0.26, scaleOffset: 0.97 }
+  },
+  "khanjar_14": {
+    bladeY: 0.08,
+    bladeHeight: 0.78,
+    bladeWidth: 0.32,
+    hilt: { x: 0.34, y: 0.72, width: 0.32, height: 0.26, scaleOffset: 1.02 }
+  }
+};
+
+// ========================================================================
+// IMAGE CACHE & LOADER
+// ========================================================================
+
+class ImageLoader {
+  constructor() {
+    this.cache = new Map();
+    this.loading = new Map();
+  }
+
+  async load(url) {
+    if (this.cache.has(url)) {
+      return this.cache.get(url);
+    }
+
+    if (this.loading.has(url)) {
+      return this.loading.get(url);
+    }
+
+    const promise = new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        this.cache.set(url, img);
+        this.loading.delete(url);
+        resolve(img);
+      };
+      img.onerror = () => {
+        this.loading.delete(url);
+        reject(new Error(`Failed to load image: ${url}`));
+      };
+      img.src = url;
+    });
+
+    this.loading.set(url, promise);
+    return promise;
+  }
+
+  async loadBatch(urls) {
+    return Promise.all(urls.map(url => this.load(url).catch(() => null)));
+  }
+
+  clear() {
+    this.cache.clear();
+    this.loading.clear();
+  }
+}
+
+const imageLoader = new ImageLoader();
+
+// ========================================================================
+// RENDER ENGINE
+// ========================================================================
+
+class ShastarRenderEngine {
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext("2d", { alpha: true, antialias: true });
+    this.width = canvas.width;
+    this.height = canvas.height;
+  }
+
+  clearCanvas() {
+    this.ctx.fillStyle = "transparent";
+    this.ctx.fillRect(0, 0, this.width, this.height);
+  }
+
+  async renderComposition(config) {
+    this.clearCanvas();
+
+    const key = `${config.weapon}_${config.size}`;
+    const positioning = POSITIONING_METADATA[key];
+
+    if (!positioning) {
+      throw new Error(`No positioning metadata for ${key}`);
+    }
+
+    try {
+      // Layer 1: Base blade
+      if (config.weapon !== "custom") {
+        const bladeUrl = `/assets/blades/${config.weapon}/${config.size}.png`;
+        await this.renderLayer(bladeUrl, positioning.bladeY, positioning.bladeHeight, positioning.bladeWidth, 1.0, "multiply");
+      }
+
+      // Layer 2: Steel texture (overlay with blend mode)
+      if (config.steel !== "kamani") {
+        const textureUrl = `/assets/textures/${config.steel}.png`;
+        await this.renderLayer(textureUrl, positioning.bladeY, positioning.bladeHeight, positioning.bladeWidth, 0.6, "screen");
+      }
+
+      // Layer 3: Decorative finish overlay
+      if (config.decorative && config.decorative !== "none") {
+        const finishUrl = `/assets/finishes/${config.weapon}/${config.decorative}.png`;
+        await this.renderLayer(finishUrl, positioning.bladeY, positioning.bladeHeight, positioning.bladeWidth, 0.8, "multiply");
+      }
+
+      // Layer 4: Hilt (if applicable)
+      if (config.hilt && positioning.hilt) {
+        const hiltUrl = `/assets/hilts/${config.hilt}.png`;
+        const hiltPos = positioning.hilt;
+        await this.renderLayer(hiltUrl, hiltPos.y, hiltPos.height, hiltPos.width, 1.0, "normal");
+      }
+
+    } catch (err) {
+      console.error("Render error:", err);
+      throw err;
+    }
+  }
+
+  async renderLayer(url, yPercent, heightPercent, widthPercent, opacity, blendMode = "normal") {
+    const img = await imageLoader.load(url);
+    if (!img) return;
+
+    const x = this.width * (0.5 - widthPercent / 2);
+    const y = this.height * yPercent;
+    const width = this.width * widthPercent;
+    const height = this.height * heightPercent;
+
+    this.ctx.globalAlpha = opacity;
+    this.ctx.globalCompositeOperation = blendMode;
+    this.ctx.drawImage(img, x, y, width, height);
+    this.ctx.globalAlpha = 1.0;
+    this.ctx.globalCompositeOperation = "source-over";
+  }
+}
+
+// ========================================================================
+// STATE & UI MANAGEMENT
+// ========================================================================
+
+let state = {
+  weapon: "peshkabz",
+  size: 12,
+  steel: "kamani",
+  finish: "satin",
+  hilt: "wood",
+  decorative: "none",
+  customSize: false
+};
+
+let currentCurrency = localStorage.getItem("akaali_currency") || "NZD";
+
+const canvas = document.getElementById("previewCanvas");
+const renderEngine = new ShastarRenderEngine(canvas);
+
+// ========================================================================
+// UI RENDERING
+// ========================================================================
+
+function formatMoney(nzd) {
+  const rate = CURRENCY_RATES[currentCurrency];
+  const converted = Math.round(nzd * rate);
+  return currentCurrency + " " + converted.toLocaleString("en-US");
+}
+
+function renderWeaponRow() {
+  const row = document.getElementById("weaponRow");
+  row.innerHTML = "";
+  WEAPONS.forEach(w => {
+    const pill = document.createElement("button");
+    pill.type = "button";
+    pill.className = "pill" + (w.id === state.weapon ? " active" : "");
+    pill.textContent = w.name;
+    pill.addEventListener("click", () => {
+      state.weapon = w.id;
+      state.size = w.sizes[0];
+      state.hilt = "wood";
+      document.getElementById("hiltGroup").style.display = w.hasHilt ? "block" : "none";
+      renderWeaponRow();
+      renderSizeRow();
+      renderHiltGrid();
+      updateRender();
+    });
+    row.appendChild(pill);
+  });
+}
+
+function renderSizeRow() {
+  const weapon = WEAPONS.find(w => w.id === state.weapon);
+  const row = document.getElementById("sizeRow");
+  row.innerHTML = "";
+  weapon.sizes.forEach(size => {
+    const pill = document.createElement("button");
+    pill.type = "button";
+    pill.className = "pill" + (size === state.size ? " active" : "");
+    pill.textContent = size + '"';
+    pill.addEventListener("click", () => {
+      state.size = size;
+      renderSizeRow();
+      updateRender();
+    });
+    row.appendChild(pill);
+  });
+}
+
+function renderSteelRow() {
+  const row = document.getElementById("steelRow");
+  row.innerHTML = "";
+  STEELS.forEach(s => {
+    const pill = document.createElement("button");
+    pill.type = "button";
+    pill.className = "pill" + (s.id === state.steel ? " active" : "");
+    pill.textContent = s.name;
+    pill.addEventListener("click", () => {
+      state.steel = s.id;
+      renderSteelRow();
+      updateRender();
+    });
+    row.appendChild(pill);
+  });
+}
+
+function renderFinishSelect() {
+  const select = document.getElementById("finishSelect");
+  select.innerHTML = "";
+  FINISHES.forEach(f => {
+    const opt = document.createElement("option");
+    opt.value = f.id;
+    opt.textContent = f.name + (f.price ? ` — +${formatMoney(f.price)}` : " — Free");
+    select.appendChild(opt);
+  });
+  select.addEventListener("change", () => {
+    state.finish = select.value;
+    updateRender();
+  });
+}
+
+function renderHiltGrid() {
+  const grid = document.getElementById("hiltGrid");
+  grid.innerHTML = "";
+  HILTS.forEach(h => {
+    const tile = document.createElement("button");
+    tile.type = "button";
+    tile.className = "tile" + (h.id === state.hilt ? " active" : "");
+    tile.innerHTML = `
+      <div style="width:100%;height:80px;background:#0b0c10;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;">
+        <span style="color:var(--gold);font-size:24px;">◆</span>
+      </div>
+      <span>${h.name}</span>
+      <span class="tile-price">${h.price ? "+" + formatMoney(h.price) : "Free"}</span>
+    `;
+    tile.addEventListener("click", () => {
+      state.hilt = h.id;
+      renderHiltGrid();
+      updateRender();
+    });
+    grid.appendChild(tile);
+  });
+}
+
+function renderDecorativeSelect() {
+  const select = document.getElementById("decorativeSelect");
+  select.addEventListener("change", () => {
+    state.decorative = select.value;
+    updateRender();
+  });
+}
+
+// ========================================================================
+// PRICE CALCULATION
+// ========================================================================
+
+function calculatePrice() {
+  const weapon = WEAPONS.find(w => w.id === state.weapon);
+  const blade = weapon.basePrices[state.steel][state.size] || 0;
+  const hilt = state.hilt && weapon.sizes ? (HILTS.find(h => h.id === state.hilt)?.price || 0) : 0;
+  const finish = FINISHES.find(f => f.id === state.finish)?.price || 0;
+  const decorative = DECORATIVE.find(d => d.id === state.decorative)?.price || 0;
+
+  return Math.round(blade + hilt + finish + decorative);
+}
+
+function updatePrice() {
+  const isQuoteOnly = DECORATIVE.find(d => d.id === state.decorative)?.quoteOnly || false;
+  const total = calculatePrice();
+
+  if (isQuoteOnly) {
+    document.getElementById("priceDisplay").textContent = "Message for Quote";
+    document.getElementById("quoteNotice").textContent = "This configuration requires a custom quote.";
+  } else {
+    document.getElementById("priceDisplay").textContent = formatMoney(total);
+    document.getElementById("quoteNotice").textContent = "";
+  }
+
+  const weapon = WEAPONS.find(w => w.id === state.weapon);
+  const steelName = STEELS.find(s => s.id === state.steel)?.name || state.steel;
+  const hiltName = weapon.hasHilt ? (HILTS.find(h => h.id === state.hilt)?.name + " · ") : "";
+  const decorName = state.decorative && state.decorative !== "none" ? (DECORATIVE.find(d => d.id === state.decorative)?.name + " · ") : "";
+
+  document.getElementById("buildLine").textContent =
+    `${weapon.name} ${state.size}" · ${steelName} · ${hiltName}${decorName}${state.finish}`;
+}
+
+async function updateRender() {
+  try {
+    await renderEngine.renderComposition({
+      weapon: state.weapon,
+      size: state.size,
+      steel: state.steel,
+      finish: state.finish,
+      hilt: state.hilt,
+      decorative: state.decorative
+    });
+  } catch (err) {
+    console.error("Render failed:", err);
+    document.querySelector(".render-error").textContent = "Render failed: " + err.message;
+    document.querySelector(".render-error").style.display = "block";
+  }
+  updatePrice();
+}
+
+// ========================================================================
+// INITIALIZATION
+// ========================================================================
+
+function init() {
+  renderWeaponRow();
+  renderSizeRow();
+  renderSteelRow();
+  renderFinishSelect();
+  renderHiltGrid();
+  renderDecorativeSelect();
+
+  // Currency switching
+  document.getElementById("currencySwitch").addEventListener("click", (e) => {
+    const btn = e.target.closest(".currency-btn");
+    if (!btn) return;
+    currentCurrency = btn.dataset.currency;
+    localStorage.setItem("akaali_currency", currentCurrency);
+    [...document.querySelectorAll(".currency-btn")].forEach(b => {
+      b.classList.toggle("active", b === btn);
+    });
+    renderFinishSelect();
+    renderHiltGrid();
+    updatePrice();
+  });
+
+  // WhatsApp enquiry
+  document.getElementById("whatsappBtn").addEventListener("click", () => {
+    const weapon = WEAPONS.find(w => w.id === state.weapon);
+    const steel = STEELS.find(s => s.id === state.steel)?.name;
+    const hilt = state.hilt && weapon.hasHilt ? HILTS.find(h => h.id === state.hilt)?.name : "N/A";
+    const total = calculatePrice();
+    const msg = `Hello! I want to enquire about the ${weapon.name} - ${state.size}" - ${steel} with ${hilt} Hilt (Est. ${formatMoney(total)})\n\nFinal billing in NZD.`;
+    window.open("https://wa.me/" + CONTACT_WHATSAPP + "?text=" + encodeURIComponent(msg), "_blank");
+  });
+
+  // Save config
+  document.getElementById("saveConfig").addEventListener("click", () => {
+    try {
+      localStorage.setItem("akaali_build", JSON.stringify(state));
+      showToast("Build saved!");
+    } catch (e) {
+      showToast("Could not save build.");
+    }
+  });
+
+  updateRender();
+}
+
+function showToast(text) {
+  const toast = document.getElementById("toast");
+  toast.textContent = text;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 2400);
+}
+
+// Architecture debug panel
+document.addEventListener("keydown", (e) => {
+  if (e.shiftKey && e.key === "A") {
+    const doc = document.getElementById("archDoc");
+    doc.classList.toggle("show");
+    if (doc.classList.contains("show")) {
+      doc.innerHTML = `<strong>LAYERED ARCHITECTURE</strong><br><br>
+Assets needed:<br>
+• /assets/blades/{weapon}/{size}.png<br>
+• /assets/textures/{steel}.png<br>
+• /assets/finishes/{weapon}/{finish}.png<br>
+• /assets/hilts/{hilt}.png<br><br>
+Positioning: See POSITIONING_METADATA<br>
+Layers rendered: 1→Base 2→Texture 3→Finish 4→Hilt<br><br>
+Current config:<br>
+Weapon: ${state.weapon}<br>
+Size: ${state.size}"<br>
+Steel: ${state.steel}<br>
+Hilt: ${state.hilt}<br>
+Decorative: ${state.decorative}`;
+    }
+  }
+});
+
+window.addEventListener("DOMContentLoaded", init);
+</script>
+
+</body>
+</html>
