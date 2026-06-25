@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Akaali Arsenal | Layered Image Configurator</title>
-  <meta name="description" content="Live layered rendering: blade base + hilt overlay composition.">
   <style>
     :root {
       --bg: #0b0c10;
@@ -13,8 +12,6 @@
       --gold-light: #e8c97b;
       --text: #f5f5f5;
       --muted: #b4b4b4;
-      --radius: 18px;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -24,563 +21,260 @@
       color: var(--text);
       min-height: 100vh;
     }
-    a { text-decoration: none; color: inherit; }
-    img { display: block; width: 100%; }
     button { cursor: pointer; border: none; font: inherit; }
     .container { width: min(1400px, 92%); margin: auto; }
-
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 999;
-      backdrop-filter: blur(14px);
-      background: rgba(10, 10, 10, .85);
-      border-bottom: 1px solid rgba(200, 160, 77, .2);
-      padding: 1rem 0;
-    }
-    .nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .brand {
-      font-size: 1.35rem;
-      font-weight: 700;
-      letter-spacing: .05em;
-      color: var(--gold);
-    }
-
-    .hero {
-      padding: 60px 0 40px;
-      text-align: center;
-    }
-    .hero h1 {
-      font-size: clamp(2rem, 5vw, 3.5rem);
-      color: var(--gold);
-      margin-bottom: 8px;
-    }
-    .hero h2 {
-      font-size: clamp(1rem, 2vw, 1.3rem);
-      font-weight: 400;
-      color: var(--text);
-      margin-bottom: 12px;
-    }
-    .hero p {
-      max-width: 600px;
-      margin: auto;
-      color: var(--muted);
-      line-height: 1.6;
-      font-size: 0.95rem;
-    }
-
-    .main-layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 40px;
-      padding: 60px 0 100px;
-      align-items: start;
-    }
-
-    .canvas-wrapper {
-      background: var(--card);
-      border: 1px solid rgba(255, 255, 255, .08);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      aspect-ratio: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-
-    #compositeCanvas {
-      max-width: 100%;
-      max-height: 100%;
-      display: block;
-      image-rendering: crisp-edges;
-    }
-
-    .status-msg {
-      position: absolute;
-      color: var(--muted);
-      font-size: 0.9rem;
-      text-align: center;
-    }
-
-    .config-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-    }
-
-    .section {
-      border-top: 1px solid rgba(255, 255, 255, .08);
-      padding-top: 25px;
-    }
-    .section:first-child {
-      border-top: none;
-      padding-top: 0;
-    }
-
-    .section-title {
-      font-size: 1.1rem;
-      color: var(--gold);
-      margin-bottom: 16px;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-    }
-
-    .pill-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .pill {
-      padding: 9px 16px;
-      border-radius: 999px;
-      background: #1b2431;
-      color: var(--muted);
-      border: 1px solid rgba(255, 255, 255, .1);
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: all 0.15s;
-      font-weight: 500;
-    }
-
-    .pill:hover {
-      border-color: var(--gold-light);
-      color: var(--gold-light);
-      background: #242f3f;
-    }
-
-    .pill.active {
-      background: var(--gold);
-      color: #111;
-      border-color: var(--gold);
-      font-weight: 700;
-    }
-
-    .hilt-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-
-    .hilt-tile {
-      aspect-ratio: 1;
-      background: #1b2431;
-      border: 2px solid rgba(255, 255, 255, .1);
-      border-radius: 10px;
-      padding: 8px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.15s;
-      text-align: center;
-    }
-
-    .hilt-tile:hover {
-      border-color: var(--gold-light);
-      background: #242f3f;
-    }
-
-    .hilt-tile.active {
-      border-color: var(--gold);
-      background: #1b2431;
-      box-shadow: 0 0 12px rgba(200, 160, 77, 0.3);
-    }
-
-    .hilt-tile-thumb {
-      width: 60px;
-      height: 60px;
-      background: #0b0c10;
-      border-radius: 6px;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .hilt-tile-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-
-    .hilt-tile-name {
-      font-size: 0.75rem;
-      color: var(--text);
-      line-height: 1.2;
-      font-weight: 500;
-    }
-
-    .info-box {
-      background: rgba(200, 160, 77, 0.08);
-      border-left: 3px solid var(--gold);
-      padding: 12px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      color: var(--text-2);
-      line-height: 1.5;
-    }
-
-    footer {
-      padding: 30px 0 50px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.8rem;
-      border-top: 1px solid rgba(255, 255, 255, .06);
-    }
-
-    @media (max-width: 900px) {
-      .main-layout {
-        grid-template-columns: 1fr;
-        gap: 30px;
-      }
-      .hilt-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
-    @media (max-width: 600px) {
-      .hilt-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .main-layout {
-        padding: 40px 0 60px;
-      }
-    }
+    
+    header { sticky position: top; z-index: 999; backdrop-filter: blur(14px); background: rgba(10, 10, 10, .85); border-bottom: 1px solid rgba(200, 160, 77, .2); padding: 1rem 0; }
+    .nav { display: flex; justify-content: space-between; align-items: center; }
+    .brand { font-size: 1.35rem; font-weight: 700; letter-spacing: .05em; color: var(--gold); }
+    
+    .hero { padding: 60px 0 40px; text-align: center; }
+    .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); color: var(--gold); margin-bottom: 8px; }
+    .hero p { max-width: 600px; margin: auto; color: var(--muted); line-height: 1.6; font-size: 0.95rem; }
+    
+    .main-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding: 60px 0 100px; align-items: start; }
+    
+    .canvas-wrapper { background: var(--card); border: 1px solid rgba(255, 255, 255, .08); border-radius: 18px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.35); aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; position: relative; }
+    
+    #compositeCanvas { max-width: 100%; max-height: 100%; display: block; image-rendering: crisp-edges; }
+    
+    .status-msg { position: absolute; color: var(--muted); font-size: 0.9rem; }
+    
+    .config-panel { display: flex; flex-direction: column; gap: 30px; }
+    
+    .section { border-top: 1px solid rgba(255, 255, 255, .08); padding-top: 25px; }
+    .section:first-child { border-top: none; padding-top: 0; }
+    
+    .section-title { font-size: 1.1rem; color: var(--gold); margin-bottom: 16px; font-weight: 600; }
+    
+    .pill-group { display: flex; flex-wrap: wrap; gap: 8px; }
+    
+    .pill { padding: 9px 16px; border-radius: 999px; background: #1b2431; color: var(--muted); border: 1px solid rgba(255, 255, 255, .1); font-size: 0.85rem; cursor: pointer; transition: all 0.15s; font-weight: 500; }
+    
+    .pill:hover { border-color: var(--gold-light); color: var(--gold-light); background: #242f3f; }
+    
+    .pill.active { background: var(--gold); color: #111; border-color: var(--gold); font-weight: 700; }
+    
+    .hilt-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    
+    .hilt-tile { aspect-ratio: 1; background: #1b2431; border: 2px solid rgba(255, 255, 255, .1); border-radius: 10px; padding: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.15s; text-align: center; }
+    
+    .hilt-tile:hover { border-color: var(--gold-light); background: #242f3f; }
+    
+    .hilt-tile.active { border-color: var(--gold); box-shadow: 0 0 12px rgba(200, 160, 77, 0.3); }
+    
+    .hilt-tile-thumb { width: 60px; height: 60px; background: #0b0c10; border-radius: 6px; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    
+    .hilt-tile-thumb img { width: 100%; height: 100%; object-fit: contain; }
+    
+    .hilt-tile-name { font-size: 0.75rem; color: var(--text); line-height: 1.2; font-weight: 500; }
+    
+    .info-box { background: rgba(200, 160, 77, 0.08); border-left: 3px solid var(--gold); padding: 12px; border-radius: 6px; font-size: 0.85rem; color: var(--text); line-height: 1.5; }
+    
+    footer { padding: 30px 0 50px; text-align: center; color: var(--muted); font-size: 0.8rem; border-top: 1px solid rgba(255, 255, 255, .06); }
+    
+    @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; gap: 30px; } .hilt-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 600px) { .hilt-grid { grid-template-columns: repeat(2, 1fr); } }
   </style>
 </head>
 <body>
 
 <header>
   <div class="container nav">
-    <div class="brand">AKAALI ARSENAL · CONFIGURATOR</div>
+    <div class="brand">AKAALI ARSENAL</div>
   </div>
 </header>
 
 <section class="hero">
   <div class="container">
-    <h1>Live Layered Composition</h1>
-    <h2>Blade + Hilt Configurator</h2>
-    <p>Select a weapon, size, and hilt material. The system renders your custom composition in real-time.</p>
+    <h1>Live Composition</h1>
+    <p>Blade + Hilt rendered in real-time. No pre-generated images.</p>
   </div>
 </section>
 
 <main class="container">
   <div class="main-layout">
-
-    <!-- CANVAS -->
     <div class="canvas-wrapper">
-      <canvas id="compositeCanvas" width="600" height="800"></canvas>
+      <canvas id="compositeCanvas" width="500" height="800"></canvas>
       <div class="status-msg" id="statusMsg"></div>
     </div>
 
-    <!-- CONFIG -->
     <div class="config-panel">
-
-      <!-- WEAPON SELECTION -->
       <div class="section">
-        <h3 class="section-title">1. Choose Weapon</h3>
+        <h3 class="section-title">1. Weapon</h3>
         <div class="pill-group" id="weaponGroup"></div>
       </div>
 
-      <!-- SIZE SELECTION -->
       <div class="section">
-        <h3 class="section-title">2. Choose Size</h3>
+        <h3 class="section-title">2. Size</h3>
         <div class="pill-group" id="sizeGroup"></div>
       </div>
 
-      <!-- HILT SELECTION -->
       <div class="section">
-        <h3 class="section-title">3. Choose Hilt</h3>
+        <h3 class="section-title">3. Hilt</h3>
         <div class="hilt-grid" id="hiltGrid"></div>
       </div>
 
-      <div class="info-box">
-        ✦ Blade image + hilt overlay are composited live in your browser. No pre-generated combination images needed.
-      </div>
-
+      <div class="info-box">✦ Live blade + hilt composition on canvas</div>
     </div>
-
   </div>
 </main>
 
 <footer>
-  <div class="container">
-    Akaali Arsenal · ਅਕਾਲੀ ਅਸਲਾ · Layered Image Configurator
-  </div>
+  <div class="container">Akaali Arsenal · ਅਕਾਲੀ ਅਸਲਾ · Layered Configurator</div>
 </footer>
 
 <script>
-/**
- * ========================================================================
- * AKAALI ARSENAL LAYERED IMAGE CONFIGURATOR
- * ========================================================================
- *
- * Implements live blade + hilt composition using HTML5 Canvas.
- *
- * ARCHITECTURE:
- * 1. Load base blade image (weapon + size)
- * 2. Load hilt overlay PNG (transparent)
- * 3. Position hilt using metadata coordinates
- * 4. Scale hilt using metadata dimensions
- * 5. Composite on canvas
- *
- * NO pre-generated combination images.
- * NO steel texture rendering.
- * NO finish overlay rendering.
- * ONLY: Blade + Hilt layers.
- *
- * Extensible: Finish overlays can be added as Layer 3 later without
- * changing this architecture.
- * ========================================================================
- */
-
-// ========================================================================
-// WEAPON DEFINITIONS
-// ========================================================================
+const GITHUB_RAW = "https://raw.githubusercontent.com/Akaali-Daljit/Akaali-Store/images";
 
 const WEAPONS = [
-  {
-    id: "peshkabz",
-    name: "Peshkabz",
-    sizes: [12, 14, 18]
-  },
-  {
-    id: "kard",
-    name: "Kard",
-    sizes: [12, 14, 16]
-  },
-  {
-    id: "katar",
-    name: "Katar",
-    sizes: [12, 14, 18]
-  },
-  {
-    id: "bichhua",
-    name: "Bichhua",
-    sizes: [12, 14, 18]
-  },
-  {
-    id: "jambiya",
-    name: "Jambiya",
-    sizes: [10, 12, 14]
-  },
-  {
-    id: "khanjar",
-    name: "Khanjar",
-    sizes: [10, 12, 14]
-  }
+  { id: "peshkabz", name: "Peshkabz", sizes: [12, 14, 16, 18] },
+  { id: "kard", name: "Kard", sizes: [12, 14, 16, 18] },
+  { id: "katar", name: "Katar", sizes: [14, 18, 20] },
+  { id: "bichhua", name: "Bichhua", sizes: [12, 14, 16, 18] },
+  { id: "jambiya", name: "Jambiya", sizes: [12, 14] },
+  { id: "khanjar", name: "Khanjar", sizes: [12, 14, 16, 18] }
 ];
 
-const HILTS = [
-  { id: "wood", name: "Wooden" },
-  { id: "bone", name: "Bone" },
-  { id: "marble", name: "Marble" },
-  { id: "silver", name: "Silver" },
-  { id: "niello-floral", name: "Niello Floral" },
-  { id: "niello-crest", name: "Niello Crest" },
-  { id: "pommel", name: "Pommel" },
-  { id: "abalone", name: "Abalone" },
-  { id: "agate", name: "Agate" },
-  { id: "lapis", name: "Lapis" },
-  { id: "jade", name: "Jade" },
-  { id: "ruby", name: "Ruby" }
-];
-
-// ========================================================================
-// POSITIONING METADATA
-// ========================================================================
-// Format: "weaponId_size": { x, y, width, height }
-// All values are in PIXELS (absolute canvas coordinates)
-// These define where and how large the hilt overlay should be positioned
-// on the 600x800 canvas.
-
-const HILT_POSITIONING = {
-  // PESHKABZ
-  "peshkabz_12": { x: 200, y: 520, width: 200, height: 160 },
-  "peshkabz_14": { x: 190, y: 530, width: 220, height: 170 },
-  "peshkabz_18": { x: 170, y: 540, width: 260, height: 180 },
-
-  // KARD
-  "kard_12": { x: 220, y: 550, width: 160, height: 140 },
-  "kard_14": { x: 210, y: 555, width: 180, height: 150 },
-  "kard_16": { x: 200, y: 560, width: 200, height: 160 },
-
-  // KATAR (no hilt, but metadata for reference)
-  "katar_12": { x: 0, y: 0, width: 0, height: 0 },
-  "katar_14": { x: 0, y: 0, width: 0, height: 0 },
-  "katar_18": { x: 0, y: 0, width: 0, height: 0 },
-
-  // BICHHUA
-  "bichhua_12": { x: 230, y: 560, width: 140, height: 130 },
-  "bichhua_14": { x: 220, y: 565, width: 160, height: 140 },
-  "bichhua_18": { x: 210, y: 570, width: 180, height: 150 },
-
-  // JAMBIYA
-  "jambiya_10": { x: 210, y: 550, width: 180, height: 150 },
-  "jambiya_12": { x: 200, y: 555, width: 200, height: 160 },
-  "jambiya_14": { x: 190, y: 560, width: 220, height: 170 },
-
-  // KHANJAR
-  "khanjar_10": { x: 210, y: 550, width: 180, height: 160 },
-  "khanjar_12": { x: 200, y: 555, width: 200, height: 170 },
-  "khanjar_14": { x: 190, y: 560, width: 220, height: 180 }
+const HILT_MAPPING = {
+  "camel-bone": "Camel%20Bone%20Hilt%20free.jpeg",
+  "silver": "Silver%20Hilt%20200.jpeg",
+  "black-silver": "Black%20with%20Silver%20Koftgari%2050.jpeg",
+  "jade": "Jade%20Hilt%20150.jpeg",
+  "agate": "Agate%20Hilt.jpeg",
+  "sodamite": "Sodamite%20Hilt%20150.jpeg",
+  "hilt-250": "Hilt%20250.jpeg",
+  "hilt-silver-100": "Hilt%20Silver%20Thick%20100.jpeg"
 };
 
-// ========================================================================
-// IMAGE LOADER
-// ========================================================================
+const BLADE_MAPPING = {
+  "peshkabz_12": "PESHKABZ%2012%2014.jpeg",
+  "peshkabz_14": "PESHKABZ%2012%2014.jpeg",
+  "peshkabz_16": "PESHKABZ%2016,%2018%20(1).jpeg",
+  "peshkabz_18": "PESHKABZ%2016,%2018%20(1).jpeg",
+  "kard_12": "Kard%2012%20inch%20blade.jpeg",
+  "kard_14": "Kard%2014,%2016,%2018%20inch.png",
+  "kard_16": "Kard%2014,%2016,%2018%20inch.png",
+  "kard_18": "Kard%2014,%2016,%2018%20inch.png",
+  "katar_14": "14%20inch%20katar.jpeg",
+  "katar_18": "18%20inch%20katar.png",
+  "katar_20": "Hooded%20Katar%2020%20inch.png",
+  "bichhua_12": "BICHHUA%2012.png",
+  "bichhua_14": "Bichhua%2014,%2016,%2018.jpeg",
+  "bichhua_16": "Bichhua%2014,%2016,%2018.jpeg",
+  "bichhua_18": "Bichhua%2014,%2016,%2018.jpeg",
+  "jambiya_12": "Jambia%2012%2014%20inch%20blade.jpeg",
+  "jambiya_14": "Jambia%2012%2014%20inch%20blade.jpeg",
+  "khanjar_12": "Khanjar%2012.jpeg",
+  "khanjar_14": "Khanjar%2014,%2016%20and%2018%20inch.jpeg",
+  "khanjar_16": "Khanjar%2014,%2016%20and%2018%20inch.jpeg",
+  "khanjar_18": "Khanjar%2014,%2016%20and%2018%20inch.jpeg"
+};
+
+const HILT_POSITIONING = {
+  "peshkabz_12": { x: 120, y: 550, w: 260, h: 170 },
+  "peshkabz_14": { x: 100, y: 560, w: 300, h: 180 },
+  "peshkabz_16": { x: 80, y: 570, w: 340, h: 190 },
+  "peshkabz_18": { x: 60, y: 580, w: 380, h: 200 },
+  "kard_12": { x: 150, y: 570, w: 200, h: 160 },
+  "kard_14": { x: 130, y: 575, w: 240, h: 170 },
+  "kard_16": { x: 110, y: 580, w: 280, h: 180 },
+  "kard_18": { x: 90, y: 585, w: 320, h: 190 },
+  "katar_14": { x: 140, y: 560, w: 220, h: 180 },
+  "katar_18": { x: 110, y: 570, w: 280, h: 200 },
+  "katar_20": { x: 80, y: 580, w: 340, h: 220 },
+  "bichhua_12": { x: 160, y: 580, w: 180, h: 150 },
+  "bichhua_14": { x: 140, y: 585, w: 220, h: 160 },
+  "bichhua_16": { x: 120, y: 590, w: 260, h: 170 },
+  "bichhua_18": { x: 100, y: 595, w: 300, h: 180 },
+  "jambiya_12": { x: 140, y: 570, w: 220, h: 170 },
+  "jambiya_14": { x: 120, y: 575, w: 260, h: 180 },
+  "khanjar_12": { x: 140, y: 570, w: 220, h: 170 },
+  "khanjar_14": { x: 120, y: 575, w: 260, h: 180 },
+  "khanjar_16": { x: 100, y: 580, w: 300, h: 190 },
+  "khanjar_18": { x: 80, y: 585, w: 340, h: 200 }
+};
 
 class ImageCache {
   constructor() {
     this.cache = new Map();
-    this.loading = new Map();
   }
 
   async load(url) {
-    if (this.cache.has(url)) {
-      return this.cache.get(url);
-    }
+    if (this.cache.has(url)) return this.cache.get(url);
 
-    if (this.loading.has(url)) {
-      return this.loading.get(url);
-    }
-
-    const promise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const img = new Image();
       img.crossOrigin = "anonymous";
-      img.onload = () => {
-        this.cache.set(url, img);
-        this.loading.delete(url);
-        resolve(img);
-      };
-      img.onerror = () => {
-        this.loading.delete(url);
-        reject(new Error(`Failed to load: ${url}`));
-      };
+      img.onload = () => { this.cache.set(url, img); resolve(img); };
+      img.onerror = () => reject(new Error(`Failed: ${url}`));
       img.src = url;
     });
-
-    this.loading.set(url, promise);
-    return promise;
-  }
-
-  clear() {
-    this.cache.clear();
-    this.loading.clear();
   }
 }
 
 const imageCache = new ImageCache();
 
-// ========================================================================
-// COMPOSITOR
-// ========================================================================
-
 class Compositor {
   constructor(canvasId) {
     this.canvas = document.getElementById(canvasId);
     this.ctx = this.canvas.getContext("2d");
-    this.width = this.canvas.width;
-    this.height = this.canvas.height;
   }
 
   clear() {
     this.ctx.fillStyle = "transparent";
-    this.ctx.fillRect(0, 0, this.width, this.height);
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
-  /**
-   * Render blade + hilt composition
-   * @param {string} weaponId - weapon family (peshkabz, kard, etc.)
-   * @param {number} size - blade size (12, 14, 18, etc.)
-   * @param {string} hiltId - hilt material (wood, bone, silver, etc.)
-   */
-  async render(weaponId, size, hiltId) {
+  async render(weapon, size, hilt) {
     this.clear();
+    const key = `${weapon}_${size}`;
+    const bladeFile = BLADE_MAPPING[key];
+    const hiltFile = HILT_MAPPING[hilt];
+    const pos = HILT_POSITIONING[key];
 
-    const key = `${weaponId}_${size}`;
-    const positioning = HILT_POSITIONING[key];
-
-    if (!positioning) {
-      throw new Error(`No positioning metadata for ${key}`);
-    }
+    if (!bladeFile || !hiltFile || !pos) throw new Error("Missing config");
 
     try {
-      // LAYER 1: Base blade image
-      const bladeUrl = `/assets/blades/${weaponId}/${size}.png`;
-      const bladeImg = await imageCache.load(bladeUrl);
-      this.ctx.drawImage(bladeImg, 0, 0, this.width, this.height);
+      const bladeUrl = `${GITHUB_RAW}/${bladeFile}`;
+      const hiltUrl = `${GITHUB_RAW}/${hiltFile}`;
 
-      // LAYER 2: Hilt overlay (only if not katar/no-hilt)
-      if (positioning.width > 0 && positioning.height > 0) {
-        const hiltUrl = `/assets/hilts/${hiltId}.png`;
-        const hiltImg = await imageCache.load(hiltUrl);
+      const blade = await imageCache.load(bladeUrl);
+      this.ctx.drawImage(blade, 0, 0, this.canvas.width, this.canvas.height);
 
-        // Draw hilt at positioned coordinates with metadata dimensions
-        this.ctx.drawImage(
-          hiltImg,
-          positioning.x,
-          positioning.y,
-          positioning.width,
-          positioning.height
-        );
-      }
-
+      const hiltImg = await imageCache.load(hiltUrl);
+      this.ctx.drawImage(hiltImg, pos.x, pos.y, pos.w, pos.h);
     } catch (err) {
-      console.error("Composition error:", err);
+      console.error(err);
       throw err;
     }
   }
 }
 
-// ========================================================================
-// UI STATE
-// ========================================================================
-
-let state = {
-  weapon: "peshkabz",
-  size: 12,
-  hilt: "wood"
-};
-
+let state = { weapon: "peshkabz", size: 12, hilt: "camel-bone" };
 const compositor = new Compositor("compositeCanvas");
 
-// ========================================================================
-// RENDER UI
-// ========================================================================
-
-function renderWeaponButtons() {
+function renderWeapons() {
   const group = document.getElementById("weaponGroup");
   group.innerHTML = "";
-
   WEAPONS.forEach(w => {
     const btn = document.createElement("button");
     btn.className = "pill" + (w.id === state.weapon ? " active" : "");
     btn.textContent = w.name;
     btn.addEventListener("click", () => {
       state.weapon = w.id;
-      state.size = w.sizes[0]; // Reset to first size
-      renderWeaponButtons();
-      renderSizeButtons();
-      updateComposition();
+      state.size = w.sizes[0];
+      renderWeapons();
+      renderSizes();
+      updateRender();
     });
     group.appendChild(btn);
   });
 }
 
-function renderSizeButtons() {
+function renderSizes() {
   const group = document.getElementById("sizeGroup");
   group.innerHTML = "";
-
   const weapon = WEAPONS.find(w => w.id === state.weapon);
   weapon.sizes.forEach(size => {
     const btn = document.createElement("button");
@@ -588,76 +282,47 @@ function renderSizeButtons() {
     btn.textContent = size + '"';
     btn.addEventListener("click", () => {
       state.size = size;
-      renderSizeButtons();
-      updateComposition();
+      renderSizes();
+      updateRender();
     });
     group.appendChild(btn);
   });
 }
 
-function renderHiltTiles() {
+function renderHilts() {
   const grid = document.getElementById("hiltGrid");
   grid.innerHTML = "";
-
-  HILTS.forEach(h => {
+  Object.keys(HILT_MAPPING).forEach(hId => {
     const tile = document.createElement("button");
-    tile.className = "hilt-tile" + (h.id === state.hilt ? " active" : "");
-
-    // Create thumbnail placeholder
-    const thumb = document.createElement("div");
-    thumb.className = "hilt-tile-thumb";
-    thumb.innerHTML = `<img src="/assets/hilts/${h.id}.png" alt="${h.name}" onerror="this.style.display='none'">`;
-
-    const name = document.createElement("div");
-    name.className = "hilt-tile-name";
-    name.textContent = h.name;
-
-    tile.appendChild(thumb);
-    tile.appendChild(name);
-
+    tile.className = "hilt-tile" + (hId === state.hilt ? " active" : "");
+    const name = hId.replace(/-/g, " ").toUpperCase();
+    tile.innerHTML = `<div class="hilt-tile-thumb"><div style="color:var(--gold);font-size:24px;">◆</div></div><div class="hilt-tile-name">${name}</div>`;
     tile.addEventListener("click", () => {
-      state.hilt = h.id;
-      renderHiltTiles();
-      updateComposition();
+      state.hilt = hId;
+      renderHilts();
+      updateRender();
     });
-
     grid.appendChild(tile);
   });
 }
 
-// ========================================================================
-// COMPOSITION UPDATE
-// ========================================================================
-
-async function updateComposition() {
+async function updateRender() {
   const statusMsg = document.getElementById("statusMsg");
-
   try {
     statusMsg.textContent = "Rendering...";
-    statusMsg.style.color = var(--muted);
-
     await compositor.render(state.weapon, state.size, state.hilt);
-
     statusMsg.textContent = "";
   } catch (err) {
-    statusMsg.textContent = "⚠ " + err.message;
-    statusMsg.style.color = "#ff6b6b";
-    console.error(err);
+    statusMsg.textContent = "⚠ Error";
   }
 }
 
-// ========================================================================
-// INITIALIZATION
-// ========================================================================
-
-function init() {
-  renderWeaponButtons();
-  renderSizeButtons();
-  renderHiltTiles();
-  updateComposition();
-}
-
-window.addEventListener("DOMContentLoaded", init);
+window.addEventListener("DOMContentLoaded", () => {
+  renderWeapons();
+  renderSizes();
+  renderHilts();
+  updateRender();
+});
 </script>
 
 </body>
